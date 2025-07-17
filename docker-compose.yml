@@ -1,0 +1,194 @@
+version: '3.8'
+
+services:
+  # Main web application
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: professional-muslim-web
+    ports:
+      - "8080:80"
+    environment:
+      - APP_ENV=production
+      - API_URL=http://localhost:3000
+      - TZ=UTC
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - muslim-app-network
+
+  # Development server for hot reload
+  dev:
+    image: cirrusci/flutter:3.16.0
+    container_name: professional-muslim-dev
+    ports:
+      - "3000:3000"
+      - "8081:8081"
+    volumes:
+      - .:/app
+      - flutter-pub-cache:/root/.pub-cache
+    working_dir: /app
+    command: >
+      sh -c "
+        flutter config --enable-web &&
+        flutter pub get &&
+        flutter run -d web-server --web-hostname 0.0.0.0 --web-port 3000
+      "
+    environment:
+      - FLUTTER_WEB_AUTO_DETECT=true
+    networks:
+      - muslim-app-network
+    profiles:
+      - dev
+
+  # Standalone web version server
+  standalone:
+    image: node:18-alpine
+    container_name: professional-muslim-standalone
+    ports:
+      - "8082:8000"
+    volumes:
+      - ./web_version:/app
+    working_dir: /app
+    command: >
+      sh -c "
+        npm install &&
+        npm start
+      "
+    environment:
+      - NODE_ENV=development
+    networks:
+      - muslim-app-network
+    profiles:
+      - dev
+
+  # Nginx reverse proxy for development
+  proxy:
+    image: nginx:alpine
+    container_name: professional-muslim-proxy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - web
+    networks:
+      - muslim-app-network
+    profiles:
+      - proxy
+
+  # Database for analytics (optional)
+  db:
+    image: postgres:15-alpine
+    container_name: professional-muslim-db
+    environment:
+      - POSTGRES_DB=muslim_app
+      - POSTGRES_USER=muslim_user
+      - POSTGRES_PASSWORD=secure_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    ports:
+      - "5432:5432"
+    networks:
+      - muslim-app-network
+    profiles:
+      - db
+
+  # Redis for caching (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: professional-muslim-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - muslim-app-network
+    profiles:
+      - cache
+
+  # Monitoring with Prometheus (optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: professional-muslim-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/etc/prometheus/console_libraries'
+      - '--web.console.templates=/etc/prometheus/consoles'
+    networks:
+      - muslim-app-network
+    profiles:
+      - monitoring
+
+  # Grafana for dashboards (optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: professional-muslim-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin123
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    networks:
+      - muslim-app-network
+    profiles:
+      - monitoring
+
+  # Lighthouse CI for performance testing
+  lighthouse:
+    image: patrickhulce/lhci-server:latest
+    container_name: professional-muslim-lighthouse
+    ports:
+      - "9001:9001"
+    environment:
+      - LHCI_STORAGE_METHOD=sql
+      - LHCI_STORAGE_SQL_DIALECT=sqlite
+      - LHCI_STORAGE_SQL_DATABASE_PATH=/data/lhci.db
+    volumes:
+      - lighthouse_data:/data
+    networks:
+      - muslim-app-network
+    profiles:
+      - testing
+
+volumes:
+  flutter-pub-cache:
+    driver: local
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+  lighthouse_data:
+    driver: local
+
+networks:
+  muslim-app-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار - أذكار المسلم المحترف</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&family=Cairo:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/css/responsive.css">
+    <link rel="stylesheet" href="assets/css/animations.css">
+</head>
+<body>
+    <div class="container py-5">
+        <div class="text-center mb-5">
+            <h1 class="mb-3">اختبار مكونات التطبيق</h1>
+            <p class="text-muted">اختبار سريع للتأكد من عمل جميع المكونات</p>
+        </div>
+
+        <!-- Test Cards -->
+        <div class="row g-4 mb-5">
+            <div class="col-md-4">
+                <div class="card card-islamic h-100">
+                    <div class="card-header-islamic">
+                        <h5 class="mb-0">
+                            <i class="fas fa-check-circle me-2"></i>
+                            اختبار البطاقات
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <p>هذه بطاقة اختبار للتأكد من التصميم الإسلامي.</p>
+                        <button class="btn btn-islamic">زر إسلامي</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card card-islamic h-100">
+                    <div class="card-body text-center">
+                        <div class="tasbih-counter mx-auto mb-3" style="width: 150px; height: 150px;">
+                            <div class="counter-inner">
+                                <div class="counter-number">33</div>
+                                <div class="counter-label">تسبيحة</div>
+                            </div>
+                            <div class="counter-ring"></div>
+                        </div>
+                        <h6>اختبار السبحة</h6>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card card-islamic h-100">
+                    <div class="card-body">
+                        <h6>اختبار النص العربي</h6>
+                        <div class="arabic-text">
+                            بِسْمِ اللَّهِ الرَّحْمَنِ الرَّحِيمِ
+                        </div>
+                        <small class="text-muted">بسم الله الرحمن الرحيم</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Test Buttons -->
+        <div class="row g-3 mb-5">
+            <div class="col-md-3">
+                <button class="btn btn-islamic w-100" onclick="testNotification()">
+                    <i class="fas fa-bell me-2"></i>اختبار الإشعار
+                </button>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-outline-islamic w-100" onclick="testModal()">
+                    <i class="fas fa-window-maximize me-2"></i>اختبار النافذة
+                </button>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-islamic w-100" onclick="testLoading()">
+                    <i class="fas fa-spinner me-2"></i>اختبار التحميل
+                </button>
+            </div>
+            <div class="col-md-3">
+                <button class="btn btn-outline-islamic w-100" onclick="toggleTheme()">
+                    <i class="fas fa-moon me-2"></i>تغيير المظهر
+                </button>
+            </div>
+        </div>
+
+        <!-- Test Forms -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card card-islamic">
+                    <div class="card-header-islamic">
+                        <h5 class="mb-0">اختبار النماذج</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">نص عربي</label>
+                            <input type="text" class="form-control" placeholder="أدخل نصاً عربياً">
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">اختيار</label>
+                            <select class="form-select">
+                                <option>الخيار الأول</option>
+                                <option>الخيار الثاني</option>
+                                <option>الخيار الثالث</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="testCheck">
+                                <label class="form-check-label" for="testCheck">
+                                    خيار اختبار
+                                </label>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">شريط التمرير</label>
+                            <input type="range" class="form-range" min="0" max="100" value="50">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="card card-islamic">
+                    <div class="card-header-islamic">
+                        <h5 class="mb-0">اختبار التقدم</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label">شريط التقدم</label>
+                            <div class="progress">
+                                <div class="progress-bar bg-islamic" role="progressbar" style="width: 65%">65%</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <h6>الإنجازات</h6>
+                            <div class="achievement-item mb-2">
+                                <i class="fas fa-star text-warning me-2"></i>
+                                <span>إنجاز تجريبي</span>
+                            </div>
+                            <div class="achievement-item">
+                                <i class="fas fa-trophy text-success me-2"></i>
+                                <span>إنجاز آخر</span>
+                            </div>
+                        </div>
+                        
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i>
+                            هذا تنبيه تجريبي
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Loading Container for Testing -->
+        <div id="loading-test" class="mt-4"></div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="assets/js/utils.js"></script>
+    <script src="assets/js/components.js"></script>
+    
+    <script>
+        // Test Functions
+        function testNotification() {
+            UI.showNotification('هذا إشعار تجريبي!', 'success');
+        }
+        
+        function testModal() {
+            const modal = UI.createModal('test-modal', 'نافذة تجريبية', `
+                <p>هذه نافذة تجريبية للتأكد من عمل النوافذ المنبثقة.</p>
+                <div class="arabic-text">
+                    قُلْ هُوَ اللَّهُ أَحَدٌ
+                </div>
+            `, {
+                footer: '<button type="button" class="btn btn-islamic" data-bs-dismiss="modal">إغلاق</button>'
+            });
+            
+            UI.showModal('test-modal');
+        }
+        
+        function testLoading() {
+            const container = document.getElementById('loading-test');
+            UI.showLoading(container, 'جاري اختبار التحميل...');
+            
+            setTimeout(() => {
+                UI.hideLoading(container);
+                container.innerHTML = '<div class="alert alert-success">تم الانتهاء من الاختبار!</div>';
+            }, 3000);
+        }
+        
+        function toggleTheme() {
+            document.body.classList.toggle('dark-theme');
+            
+            const isDark = document.body.classList.contains('dark-theme');
+            const button = event.target.closest('button');
+            const icon = button.querySelector('i');
+            
+            if (isDark) {
+                icon.className = 'fas fa-sun me-2';
+                button.innerHTML = '<i class="fas fa-sun me-2"></i>الوضع الفاتح';
+            } else {
+                icon.className = 'fas fa-moon me-2';
+                button.innerHTML = '<i class="fas fa-moon me-2"></i>الوضع الداكن';
+            }
+        }
+        
+        // Initialize tooltips
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add some test tooltips
+            const buttons = document.querySelectorAll('button');
+            buttons.forEach(button => {
+                if (!button.getAttribute('title')) {
+                    button.setAttribute('data-bs-toggle', 'tooltip');
+                    button.setAttribute('title', 'زر تجريبي');
+                }
+            });
+            
+            UI.initializeTooltips();
+        });
+    </script>
+</body>
+</html>

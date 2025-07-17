@@ -1,0 +1,231 @@
+{
+  "name": "أذكار المسلم المحترف",
+  "short_name": "أذكار المسلم",
+  "description": "تطبيق شامل للأذكار والعبادات الإسلامية - رفيقك في رحلة الإيمان",
+  "version": "1.0.0",
+  "manifest_version": 3,
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "theme_color": "#2E7D32",
+  "background_color": "#F5F5F5",
+  "dir": "rtl",
+  "lang": "ar",
+  "scope": "/",
+  
+  "icons": [
+    {
+      "src": "assets/images/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/images/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/images/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/images/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/images/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/images/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  
+  "screenshots": [
+    {
+      "src": "assets/images/screenshot-1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "platform": "wide",
+      "label": "الصفحة الرئيسية للتطبيق"
+    },
+    {
+      "src": "assets/images/screenshot-2.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "صفحة الأذكار"
+    },
+    {
+      "src": "assets/images/screenshot-3.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "مواقيت الصلاة"
+    },
+    {
+      "src": "assets/images/screenshot-4.png",
+      "sizes": "720x1280",
+      "type": "image/png",
+      "platform": "narrow",
+      "label": "السبحة الرقمية"
+    }
+  ],
+  
+  "categories": [
+    "lifestyle",
+    "education",
+    "books",
+    "religion"
+  ],
+  
+  "shortcuts": [
+    {
+      "name": "أذكار الصباح",
+      "short_name": "الصباح",
+      "description": "أذكار الصباح والاستيقاظ",
+      "url": "/#azkar?category=morning",
+      "icons": [
+        {
+          "src": "assets/images/shortcut-morning.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "أذكار المساء",
+      "short_name": "المساء",
+      "description": "أذكار المساء والنوم",
+      "url": "/#azkar?category=evening",
+      "icons": [
+        {
+          "src": "assets/images/shortcut-evening.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "مواقيت الصلاة",
+      "short_name": "الصلاة",
+      "description": "عرض مواقيت الصلاة",
+      "url": "/#prayer-times",
+      "icons": [
+        {
+          "src": "assets/images/shortcut-prayer.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "السبحة الرقمية",
+      "short_name": "السبحة",
+      "description": "السبحة الرقمية التفاعلية",
+      "url": "/#tasbih",
+      "icons": [
+        {
+          "src": "assets/images/shortcut-tasbih.png",
+          "sizes": "96x96",
+          "type": "image/png"
+        }
+      ]
+    }
+  ],
+  
+  "related_applications": [
+    {
+      "platform": "play",
+      "url": "https://play.google.com/store/apps/details?id=com.professional.muslim",
+      "id": "com.professional.muslim"
+    },
+    {
+      "platform": "itunes",
+      "url": "https://apps.apple.com/app/professional-muslim/id123456789"
+    }
+  ],
+  
+  "prefer_related_applications": false,
+  
+  "protocol_handlers": [
+    {
+      "protocol": "web+muslim",
+      "url": "/?action=%s"
+    }
+  ],
+  
+  "file_handlers": [
+    {
+      "action": "/import",
+      "accept": {
+        "application/json": [".json"]
+      }
+    }
+  ],
+  
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  },
+  
+  "permissions": [
+    "geolocation",
+    "notifications",
+    "background-sync",
+    "persistent-storage"
+  ],
+  
+  "features": [
+    "cross-origin-isolated"
+  ],
+  
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
+  
+  "handle_links": "preferred",
+  
+  "scope_extensions": [
+    {
+      "origin": "https://professional-muslim.com"
+    }
+  ],
+  
+  "id": "professional-muslim-app",
+  
+  "iarc_rating_id": "e84b072d-71b3-4d3e-86ae-31a8ce4e53b7"
+}

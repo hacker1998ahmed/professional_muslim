@@ -1,0 +1,122 @@
+{
+  "name": "professional-muslim-web",
+  "version": "1.0.0",
+  "description": "تطبيق ويب شامل للأذكار والعبادات الإسلامية - رفيقك في رحلة الإيمان",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx live-server --port=8080 --host=localhost",
+    "build": "npm run minify-css && npm run minify-js",
+    "minify-css": "npx cleancss -o assets/css/main.min.css assets/css/main.css assets/css/responsive.css assets/css/animations.css",
+    "minify-js": "npx terser assets/js/app.js assets/js/router.js assets/js/components.js assets/js/utils.js -o assets/js/app.min.js",
+    "test": "npx http-server -p 8080 -o test.html",
+    "lint": "npx eslint assets/js/*.js",
+    "format": "npx prettier --write assets/js/*.js assets/css/*.css",
+    "validate-html": "npx html-validate index.html",
+    "optimize-images": "npx imagemin assets/images/* --out-dir=assets/images/optimized",
+    "audit": "npm audit",
+    "lighthouse": "npx lighthouse http://localhost:8080 --output=html --output-path=./lighthouse-report.html",
+    "pwa-check": "npx pwa-asset-generator assets/images/logo.svg assets/images --manifest manifest.json"
+  },
+  "keywords": [
+    "islam",
+    "muslim",
+    "azkar",
+    "prayer",
+    "quran",
+    "tasbih",
+    "zakat",
+    "islamic-app",
+    "pwa",
+    "arabic",
+    "religion",
+    "spiritual"
+  ],
+  "author": {
+    "name": "Ahmed Mostafa Ibrahim",
+    "email": "gogom8870@gmail.com"
+  },
+  "license": "MIT",
+  "homepage": "https://professional-muslim.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/professional-muslim-web.git"
+  },
+  "bugs": {
+    "url": "https://github.com/your-username/professional-muslim-web/issues"
+  },
+  "devDependencies": {
+    "clean-css-cli": "^5.6.2",
+    "eslint": "^8.50.0",
+    "html-validate": "^8.5.0",
+    "http-server": "^14.1.1",
+    "imagemin": "^8.0.1",
+    "imagemin-cli": "^7.0.0",
+    "lighthouse": "^11.0.0",
+    "live-server": "^1.2.2",
+    "prettier": "^3.0.3",
+    "pwa-asset-generator": "^6.3.1",
+    "serve": "^14.2.1",
+    "terser": "^5.20.0"
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ],
+  "engines": {
+    "node": ">=14.0.0",
+    "npm": ">=6.0.0"
+  },
+  "pwa": {
+    "name": "أذكار المسلم المحترف",
+    "short_name": "أذكار المسلم",
+    "theme_color": "#2E7D32",
+    "background_color": "#F5F5F5",
+    "display": "standalone",
+    "orientation": "portrait-primary",
+    "start_url": "/",
+    "scope": "/"
+  },
+  "config": {
+    "port": 8080,
+    "host": "localhost"
+  },
+  "directories": {
+    "doc": "docs",
+    "test": "tests"
+  },
+  "files": [
+    "index.html",
+    "manifest.json",
+    "sw.js",
+    "assets/"
+  ],
+  "funding": {
+    "type": "individual",
+    "url": "https://github.com/sponsors/your-username"
+  },
+  "contributors": [
+    {
+      "name": "Ahmed Mostafa Ibrahim",
+      "email": "gogom8870@gmail.com",
+      "role": "Developer"
+    }
+  ],
+  "dependencies": {},
+  "optionalDependencies": {},
+  "peerDependencies": {},
+  "bundleDependencies": false,
+  "private": false,
+  "workspaces": [],
+  "os": [
+    "darwin",
+    "linux",
+    "win32"
+  ],
+  "cpu": [
+    "x64",
+    "arm64"
+  ]
+}

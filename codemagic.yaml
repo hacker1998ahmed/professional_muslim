@@ -1,0 +1,424 @@
+definitions:
+  env: &default_env
+    vars:
+      # Flutter Configuration
+      FLUTTER_VERSION: "3.16.0"
+      XCODE_WORKSPACE: "Runner.xcworkspace"
+      XCODE_SCHEME: "Runner"
+      
+      # App Information
+      APP_NAME: "أذكار المسلم المحترف"
+      BUNDLE_ID: "com.professional.muslim"
+      PACKAGE_NAME: "com.professional.muslim"
+      
+      # Keystore Configuration (Android)
+      CM_KEYSTORE_PATH: /tmp/keystore.keystore
+      CM_KEYSTORE: Encrypted(...)  # Add your encrypted keystore
+      CM_KEYSTORE_PASSWORD: Encrypted(...)  # Add your encrypted password
+      CM_KEY_ALIAS_PASSWORD: Encrypted(...)  # Add your encrypted alias password
+      CM_KEY_ALIAS_USERNAME: Encrypted(...)  # Add your encrypted alias
+      
+      # Google Play Configuration
+      GCLOUD_SERVICE_ACCOUNT_CREDENTIALS: Encrypted(...)  # Add your encrypted service account
+      GOOGLE_PLAY_TRACK: internal  # internal, alpha, beta, production
+      
+      # App Store Configuration
+      APP_STORE_CONNECT_ISSUER_ID: Encrypted(...)  # Add your encrypted issuer ID
+      APP_STORE_CONNECT_KEY_IDENTIFIER: Encrypted(...)  # Add your encrypted key ID
+      APP_STORE_CONNECT_PRIVATE_KEY: Encrypted(...)  # Add your encrypted private key
+      CERTIFICATE_PRIVATE_KEY: Encrypted(...)  # Add your encrypted certificate
+      
+      # Web Deployment
+      FIREBASE_TOKEN: Encrypted(...)  # Add your Firebase token for web hosting
+      NETLIFY_AUTH_TOKEN: Encrypted(...)  # Add your Netlify token
+      NETLIFY_SITE_ID: Encrypted(...)  # Add your Netlify site ID
+      
+      # Notification Configuration
+      SLACK_WEBHOOK_URL: Encrypted(...)  # Add your Slack webhook for notifications
+      DISCORD_WEBHOOK_URL: Encrypted(...)  # Add your Discord webhook
+      
+    flutter: stable
+    cocoapods: default
+
+workflows:
+  # Flutter Android Workflow
+  android-workflow:
+    name: Android Build & Deploy
+    max_build_duration: 120
+    instance_type: mac_mini_m1
+    environment:
+      <<: *default_env
+      groups:
+        - google_play
+    cache:
+      cache_paths:
+        - $FLUTTER_ROOT/.pub-cache
+        - $HOME/.gradle/caches
+        - $HOME/Library/Caches/CocoaPods
+    triggering:
+      events:
+        - push
+        - tag
+      branch_patterns:
+        - pattern: 'main'
+          include: true
+          source: true
+        - pattern: 'release/*'
+          include: true
+          source: true
+      tag_patterns:
+        - pattern: 'v*'
+          include: true
+    scripts:
+      - name: Set up local.properties
+        script: |
+          echo "flutter.sdk=$HOME/programs/flutter" > "$CM_BUILD_DIR/android/local.properties"
+      
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+      
+      - name: Flutter analyze
+        script: |
+          flutter analyze
+      
+      - name: Flutter test
+        script: |
+          flutter test
+      
+      - name: Set up code signing settings on Gradle file
+        script: |
+          echo $CM_KEYSTORE | base64 --decode > /tmp/keystore.keystore
+          cat >> "$CM_BUILD_DIR/android/key.properties" <<EOF
+          storePassword=$CM_KEYSTORE_PASSWORD
+          keyPassword=$CM_KEY_ALIAS_PASSWORD
+          keyAlias=$CM_KEY_ALIAS_USERNAME
+          storeFile=/tmp/keystore.keystore
+          EOF
+      
+      - name: Build APK with Flutter
+        script: |
+          flutter build apk --release --build-name=1.0.$BUILD_NUMBER --build-number=$BUILD_NUMBER
+      
+      - name: Build AAB with Flutter
+        script: |
+          flutter build appbundle --release --build-name=1.0.$BUILD_NUMBER --build-number=$BUILD_NUMBER
+    
+    artifacts:
+      - build/**/outputs/**/*.apk
+      - build/**/outputs/**/*.aab
+      - build/**/outputs/**/mapping.txt
+      - flutter_drive.log
+    
+    publishing:
+      email:
+        recipients:
+          - gogom8870@gmail.com
+        notify:
+          success: true
+          failure: true
+      
+      slack:
+        channel: '#builds'
+        notify_on_build_start: true
+        notify:
+          success: true
+          failure: true
+      
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: $GOOGLE_PLAY_TRACK
+        submit_as_draft: true
+
+  # Flutter iOS Workflow
+  ios-workflow:
+    name: iOS Build & Deploy
+    max_build_duration: 120
+    instance_type: mac_mini_m1
+    integrations:
+      app_store_connect: codemagic
+    environment:
+      <<: *default_env
+      groups:
+        - app_store_credentials
+      ios_signing:
+        distribution_type: app_store
+        bundle_identifier: $BUNDLE_ID
+    cache:
+      cache_paths:
+        - $FLUTTER_ROOT/.pub-cache
+        - $HOME/Library/Caches/CocoaPods
+    triggering:
+      events:
+        - push
+        - tag
+      branch_patterns:
+        - pattern: 'main'
+          include: true
+          source: true
+        - pattern: 'release/*'
+          include: true
+          source: true
+      tag_patterns:
+        - pattern: 'v*'
+          include: true
+    scripts:
+      - name: Set up keychain to be used for codesigning
+        script: |
+          keychain initialize
+      
+      - name: Fetch signing files
+        script: |
+          app-store-connect fetch-signing-files $BUNDLE_ID --type IOS_APP_STORE --create
+      
+      - name: Use system default keychain
+        script: |
+          keychain add-certificates
+      
+      - name: Set up code signing settings on Xcode project
+        script: |
+          xcode-project use-profiles
+      
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+      
+      - name: Install pods
+        script: |
+          find . -name "Podfile" -execdir pod install \;
+      
+      - name: Flutter analyze
+        script: |
+          flutter analyze
+      
+      - name: Flutter test
+        script: |
+          flutter test
+      
+      - name: Flutter build ipa
+        script: |
+          flutter build ipa --release --build-name=1.0.$BUILD_NUMBER --build-number=$BUILD_NUMBER --export-options-plist=/Users/builder/export_options.plist
+    
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - /tmp/xcodebuild_logs/*.log
+      - flutter_drive.log
+    
+    publishing:
+      email:
+        recipients:
+          - gogom8870@gmail.com
+        notify:
+          success: true
+          failure: true
+      
+      app_store_connect:
+        auth: integration
+        submit_to_testflight: true
+        beta_groups:
+          - App Store Connect Users
+        submit_to_app_store: false
+
+  # Web Workflow
+  web-workflow:
+    name: Web Build & Deploy
+    max_build_duration: 60
+    instance_type: linux_x2
+    environment:
+      <<: *default_env
+      node: 18.17.0
+      groups:
+        - web_deployment
+    cache:
+      cache_paths:
+        - $FLUTTER_ROOT/.pub-cache
+        - node_modules
+        - ~/.npm
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: 'main'
+          include: true
+          source: true
+        - pattern: 'web/*'
+          include: true
+          source: true
+    scripts:
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+      
+      - name: Enable web support
+        script: |
+          flutter config --enable-web
+      
+      - name: Build Flutter web
+        script: |
+          flutter build web --release --web-renderer html --base-href /
+      
+      - name: Install Node.js dependencies for web version
+        script: |
+          cd web_version
+          npm install
+      
+      - name: Build and optimize web version
+        script: |
+          cd web_version
+          npm run build
+      
+      - name: Prepare deployment package
+        script: |
+          mkdir -p deploy
+          cp -r build/web/* deploy/
+          cp -r web_version/* deploy/web_standalone/
+      
+      - name: Deploy to Firebase Hosting
+        script: |
+          npm install -g firebase-tools
+          cd deploy
+          firebase deploy --token $FIREBASE_TOKEN --project professional-muslim
+      
+      - name: Deploy to Netlify
+        script: |
+          npm install -g netlify-cli
+          cd deploy
+          netlify deploy --prod --dir . --auth $NETLIFY_AUTH_TOKEN --site $NETLIFY_SITE_ID
+    
+    artifacts:
+      - deploy/**
+      - build/web/**
+    
+    publishing:
+      email:
+        recipients:
+          - gogom8870@gmail.com
+        notify:
+          success: true
+          failure: true
+
+  # Testing Workflow
+  testing-workflow:
+    name: Automated Testing
+    max_build_duration: 30
+    instance_type: linux_x2
+    environment:
+      <<: *default_env
+    triggering:
+      events:
+        - pull_request
+      branch_patterns:
+        - pattern: '*'
+          include: true
+          source: true
+    scripts:
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+      
+      - name: Flutter analyze
+        script: |
+          flutter analyze --fatal-infos
+      
+      - name: Run unit tests
+        script: |
+          flutter test --coverage
+      
+      - name: Run integration tests
+        script: |
+          flutter drive --target=test_driver/app.dart
+      
+      - name: Generate test report
+        script: |
+          genhtml coverage/lcov.info -o coverage/html
+    
+    artifacts:
+      - coverage/**
+      - test_driver/screenshots/**
+    
+    publishing:
+      email:
+        recipients:
+          - gogom8870@gmail.com
+        notify:
+          success: false
+          failure: true
+
+  # Release Workflow
+  release-workflow:
+    name: Production Release
+    max_build_duration: 180
+    instance_type: mac_mini_m1
+    environment:
+      <<: *default_env
+      groups:
+        - google_play
+        - app_store_credentials
+        - web_deployment
+    triggering:
+      events:
+        - tag
+      tag_patterns:
+        - pattern: 'v*'
+          include: true
+    scripts:
+      - name: Set up environment
+        script: |
+          echo "Building release version $CM_TAG"
+      
+      - name: Get Flutter packages
+        script: |
+          flutter packages pub get
+      
+      - name: Run tests
+        script: |
+          flutter test
+      
+      - name: Build Android release
+        script: |
+          echo $CM_KEYSTORE | base64 --decode > /tmp/keystore.keystore
+          flutter build appbundle --release --build-name=${CM_TAG#v} --build-number=$BUILD_NUMBER
+      
+      - name: Build iOS release
+        script: |
+          keychain initialize
+          app-store-connect fetch-signing-files $BUNDLE_ID --type IOS_APP_STORE --create
+          keychain add-certificates
+          xcode-project use-profiles
+          find . -name "Podfile" -execdir pod install \;
+          flutter build ipa --release --build-name=${CM_TAG#v} --build-number=$BUILD_NUMBER
+      
+      - name: Build web release
+        script: |
+          flutter config --enable-web
+          flutter build web --release --web-renderer html
+      
+      - name: Create GitHub release
+        script: |
+          gh release create $CM_TAG \
+            build/app/outputs/bundle/release/app-release.aab \
+            build/ios/ipa/*.ipa \
+            --title "أذكار المسلم المحترف $CM_TAG" \
+            --notes "إصدار جديد من تطبيق أذكار المسلم المحترف"
+    
+    artifacts:
+      - build/**/outputs/**/*.aab
+      - build/ios/ipa/*.ipa
+      - build/web/**
+    
+    publishing:
+      google_play:
+        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
+        track: production
+        submit_as_draft: false
+      
+      app_store_connect:
+        auth: integration
+        submit_to_app_store: true
+      
+      email:
+        recipients:
+          - gogom8870@gmail.com
+        notify:
+          success: true
+          failure: true
